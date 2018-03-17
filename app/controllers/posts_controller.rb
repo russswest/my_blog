@@ -2,9 +2,10 @@ class PostsController < ApplicationController
 
   before_action :set_post, only: [:show, :edit, :update, :destroy]
   def index
-    @posts = Post.all
+    @q = Post.order(created_at: :desc).ransack(params[:q])
+    @posts = @q.result.page(params[:page]).per(2)
     # 最新記事用
-    @new_posts = Post.all
+    @new_posts = Post.find_newest_article
     @author = Author.first
   end
 
@@ -13,7 +14,7 @@ class PostsController < ApplicationController
   end
 
   def new
-     @post = Post.new
+    @post = Post.new
   end
 
   def create
@@ -33,7 +34,7 @@ class PostsController < ApplicationController
   end
 
   def destroy
-  
+
     @post.destroy
     redirect_to @post
   end
